@@ -1,0 +1,8 @@
+study:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        host: 127.0.0.1
+        port: 3306
+        database: studyRoom
+        username: root
+        password: 111111

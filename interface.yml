@@ -1,0 +1,524 @@
+openapi: 3.0.0
+info:
+    title: 校园自习室预约系统 - 最终清晰版接口文档
+    description: 严格按角色拆分接口 | 学生接口 / 管理员接口 / 公共接口
+    version: 1.0.0
+servers:
+    - url: http://localhost:8080/api
+      description: 本地开发环境
+
+components:
+    securitySchemes:
+        tokenAuth:
+            type: apiKey
+            in: header
+            name: token
+
+    schemas:
+        Result:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    example: 1
+                msg:
+                    type: string
+                    example: 操作成功
+                data:
+                    type: object
+            required:
+                - code
+
+        # 登录
+        UserLoginDTO:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+            required: [username, password]
+
+        AdminLoginDTO:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+            required: [username, password]
+
+        # 用户
+        UserRegisterDTO:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+                name:
+                    type: string
+                phone:
+                    type: string
+            required: [username, password, name]
+
+        UserUpdateInfoDTO:
+            type: object
+            properties:
+                name:
+                    type: string
+                phone:
+                    type: string
+            required: [name]
+
+        UserUpdatePwdDTO:
+            type: object
+            properties:
+                oldPwd:
+                    type: string
+                newPwd:
+                    type: string
+            required: [oldPwd, newPwd]
+
+        # 自习室
+        RoomAddDTO:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                roomName:
+                    type: string
+                location:
+                    type: string
+                totalSeats:
+                    type: integer
+                openTime:
+                    type: string
+                    format: time
+                closeTime:
+                    type: string
+                    format: time
+            required:
+                [roomId, roomName, location, totalSeats, openTime, closeTime]
+
+        # 座位
+        SeatAddDTO:
+            type: object
+            properties:
+                roomId:
+                    type: string
+            required: [roomId]
+
+        # 预约
+        ReservationAddDTO:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                seatId:
+                    type: integer
+                reserveDate:
+                    type: string
+                    format: date
+                startTime:
+                    type: string
+                    format: time
+                endTime:
+                    type: string
+                    format: time
+            required: [roomId, seatId, reserveDate, startTime, endTime]
+
+        # 公告
+        NoticeAddDTO:
+            type: object
+            properties:
+                title:
+                    type: string
+                content:
+                    type: string
+            required: [title, content]
+
+paths:
+    # ==============================================
+    # 【1】登录模块 —— 学生/管理员通用
+    # ==============================================
+    /login/user:
+        post:
+            summary: 学生登录
+            tags: [1. 登录模块]
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserLoginDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /login/admin:
+        post:
+            summary: 管理员登录
+            tags: [1. 登录模块]
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AdminLoginDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /logout:
+        post:
+            summary: 退出登录
+            tags: [1. 登录模块]
+            security:
+                - tokenAuth: []
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    # ==============================================
+    # 【2】学生用户专用模块 —— 只有学生能访问
+    # ==============================================
+    /user/register:
+        post:
+            summary: 用户注册
+            tags: [2. 学生用户专用]
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserRegisterDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /user/info:
+        get:
+            summary: 获取当前用户信息
+            tags: [2. 学生用户专用]
+            security:
+                - tokenAuth: []
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /user/update/info:
+        post:
+            summary: 修改个人资料
+            tags: [2. 学生用户专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserUpdateInfoDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /user/update/pwd:
+        post:
+            summary: 修改密码
+            tags: [2. 学生用户专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserUpdatePwdDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /reservation/add:
+        post:
+            summary: 预约座位
+            tags: [2. 学生用户专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReservationAddDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /reservation/my:
+        get:
+            summary: 我的预约
+            tags: [2. 学生用户专用]
+            security:
+                - tokenAuth: []
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /reservation/cancel/{id}:
+        post:
+            summary: 取消我的预约
+            tags: [2. 学生用户专用]
+            security:
+                - tokenAuth: []
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    # ==============================================
+    # 【3】管理员专用模块 —— 只有管理员能访问
+    # ==============================================
+    /admin/user/list:
+        get:
+            summary: 查看所有用户
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/room/add:
+        post:
+            summary: 添加自习室
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/RoomAddDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/room/delete/{roomId}:
+        post:
+            summary: 删除自习室
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/seat/add:
+        post:
+            summary: 添加座位
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/SeatAddDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/seat/delete/{seatId}:
+        post:
+            summary: 删除座位
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            parameters:
+                - name: seatId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/reservation/list:
+        get:
+            summary: 查看全部预约
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/reservation/forceCancel/{id}:
+        post:
+            summary: 强制取消预约
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/notice/add:
+        post:
+            summary: 发布公告
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NoticeAddDTO"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /admin/notice/delete/{id}:
+        post:
+            summary: 删除公告
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    # ==============================================
+    # 【4】公共开放模块 —— 不需要登录 所有人可看
+    # ==============================================
+    /room/list:
+        get:
+            summary: 自习室列表
+            tags: [4. 公共开放模块]
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /room/detail/{roomId}:
+        get:
+            summary: 自习室详情
+            tags: [4. 公共开放模块]
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /seat/list/{roomId}:
+        get:
+            summary: 查看座位
+            tags: [4. 公共开放模块]
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    /notice/list:
+        get:
+            summary: 公告列表
+            tags: [4. 公共开放模块]
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
