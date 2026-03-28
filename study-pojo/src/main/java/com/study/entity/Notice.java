@@ -11,12 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements Serializable {
+public class Notice implements Serializable {
   private static final long serialVersionUID = 1L;
   private Integer id;
-  private String username;
-  private String password;
-  private String name;
-  private String phone;
+  private String title;
+  private String content;
   private LocalDateTime createTime;
 }

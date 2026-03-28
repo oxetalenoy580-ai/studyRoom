@@ -11,12 +11,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements Serializable {
+public class Reservation implements Serializable {
   private static final long serialVersionUID = 1L;
   private Integer id;
-  private String username;
-  private String password;
-  private String name;
-  private String phone;
+  private String roomId;
+  private String userName;
+  private Integer seatId;
+  private LocalDateTime reserveDate;
+  private LocalDateTime startDate;
+  private LocalDateTime endDate;
+
+  // 预约状态：0待使用，1已使用，2已取消，3逾期
+  private Integer status;
   private LocalDateTime createTime;
 }
