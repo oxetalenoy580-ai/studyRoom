@@ -1,9 +1,9 @@
 package com.study.service;
 
 import com.study.Result.PageResult;
-import com.study.vo.UserQueryVO;
+import com.study.dto.UserQueryDTO;
 
 public interface AdminService {
 
-  PageResult getUserList(UserQueryVO queryVO);
+  PageResult getUserList(UserQueryDTO queryDTO);
 }

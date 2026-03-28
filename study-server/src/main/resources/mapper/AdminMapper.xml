@@ -6,13 +6,13 @@
     select id, username, password, name, phone, create_time
     from user
     <where>
-      <if test="queryVO.username != null and queryVO.username != ''">
+      <if test="queryDTO.username != null and queryDTO.username != ''">
         and username like concat('%', #{queryVO.username}, '%')
       </if>
-      <if test="queryVO.name != null and queryVO.name != ''">
+      <if test="queryDTO.name != null and queryDTO.name != ''">
         and name like concat('%', #{queryVO.name}, '%')
       </if>
-      <if test="queryVO.phone != null and queryVO.phone != ''">
+      <if test="queryDTO.phone != null and queryDTO.phone != ''">
         and phone like concat('%', #{queryVO.phone}, '%')
       </if>
     </where>
@@ -24,13 +24,13 @@
     select count(*)
     from user
     <where>
-      <if test="queryVO.username != null and queryVO.username != ''">
+      <if test="queryDTO.username != null and queryDTO.username != ''">
         and username like concat('%', #{queryVO.username}, '%')
       </if>
-      <if test="queryVO.name != null and queryVO.name != ''">
+      <if test="queryDTO.name != null and queryDTO.name != ''">
         and name like concat('%', #{queryVO.name}, '%')
       </if>
-      <if test="queryVO.phone != null and queryVO.phone != ''">
+      <if test="queryDTO.phone != null and queryDTO.phone != ''">
         and phone like concat('%', #{queryVO.phone}, '%')
       </if>
     </where>

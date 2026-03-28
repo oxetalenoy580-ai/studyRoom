@@ -2,8 +2,8 @@ package com.study.controller.admin;
 
 import com.study.Result.PageResult;
 import com.study.Result.Result;
+import com.study.dto.UserQueryDTO;
 import com.study.service.AdminService;
-import com.study.vo.UserQueryVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +22,9 @@ public class AdminController {
 
   @GetMapping("/user/list")
   @Operation(summary = "查询用户列表")
-  public Result getUserList(@ModelAttribute UserQueryVO queryVO) {
-    log.info("查询用户列表, 条件: {}", queryVO);
-    PageResult pageResult = adminService.getUserList(queryVO);
+  public Result getUserList(@ModelAttribute UserQueryDTO queryDTO) {
+    log.info("查询用户列表, 条件: {}", queryDTO);
+    PageResult pageResult = adminService.getUserList(queryDTO);
     return Result.success(pageResult);
   }
 }
