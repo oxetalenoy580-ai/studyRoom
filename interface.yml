@@ -35,7 +35,6 @@ components:
             required:
                 - code
 
-        # 登录相关DTO
         UserLoginDTO:
             type: object
             description: 学生登录请求参数
@@ -64,7 +63,6 @@ components:
                     example: "admin123"
             required: [username, password]
 
-        # 用户查询DTO
         UserQueryDTO:
             type: object
             description: 用户查询条件
@@ -90,7 +88,6 @@ components:
                     description: 每页数量
                     example: 10
 
-        # 用户相关DTO
         UserRegisterDTO:
             type: object
             description: 学生注册请求参数
@@ -141,7 +138,6 @@ components:
                     example: "654321"
             required: [oldPwd, newPwd]
 
-        # 预约查询DTO
         ReservationQueryDTO:
             type: object
             description: 预约查询条件
@@ -164,7 +160,6 @@ components:
                     description: 每页数量
                     example: 10
 
-        # 自习室相关DTO
         RoomAddDTO:
             type: object
             description: 管理员添加自习室参数
@@ -172,7 +167,7 @@ components:
                 roomId:
                     type: string
                     description: 自习室编号
-                    example: "1101"
+                    example: "4401"
                 roomName:
                     type: string
                     description: 自习室名称
@@ -196,9 +191,13 @@ components:
                     description: 关闭时间
                     example: "22:00:00"
             required:
-                [roomId, roomName, location, totalSeats, openTime, closeTime]
+                - roomId
+                - roomName
+                - location
+                - totalSeats
+                - openTime
+                - closeTime
 
-        # 座位相关DTO
         SeatAddDTO:
             type: object
             description: 管理员为自习室添加座位参数
@@ -206,10 +205,9 @@ components:
                 roomId:
                     type: string
                     description: 自习室编号
-                    example: "room001"
+                    example: "4401"
             required: [roomId]
 
-        # 自习室查询DTO
         RoomQueryDTO:
             type: object
             description: 自习室查询条件
@@ -231,7 +229,6 @@ components:
                     description: 每页数量
                     example: 10
 
-        # 预约相关DTO
         ReservationAddDTO:
             type: object
             description: 学生预约座位参数
@@ -239,11 +236,11 @@ components:
                 roomId:
                     type: string
                     description: 自习室编号
-                    example: "room001"
+                    example: "4401"
                 seatId:
-                    type: integer
-                    description: 座位编号
-                    example: 10
+                    type: string
+                    description: 座位编号（如4401_01）
+                    example: "4401_01"
                 reserveDate:
                     type: string
                     format: date
@@ -261,7 +258,6 @@ components:
                     example: "11:00:00"
             required: [roomId, seatId, reserveDate, startTime, endTime]
 
-        # 公告相关DTO
         NoticeAddDTO:
             type: object
             description: 管理员发布公告参数
@@ -276,7 +272,6 @@ components:
                     example: "五一期间（5.1-5.3）自习室开放时间为09:00-20:00，望周知。"
             required: [title, content]
 
-        # 公告查询DTO
         NoticeQueryDTO:
             type: object
             description: 公告查询条件
@@ -295,14 +290,10 @@ components:
                     example: 10
 
 paths:
-    # ==============================================
-    # 【1】登录模块 —— 学生/管理员通用
-    # ==============================================
     /login/user:
         post:
             summary: 学生登录
             tags: [1. 登录模块]
-            description: 学生用户通过用户名密码登录系统，成功后返回token
             requestBody:
                 required: true
                 content:
@@ -311,32 +302,16 @@ paths:
                             $ref: "#/components/schemas/UserLoginDTO"
             responses:
                 "200":
-                    description: 登录成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 登录成功
-                                data:
-                                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                "400":
-                    description: 用户名或密码错误
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 用户名或密码错误
-                                data: {}
 
     /login/admin:
         post:
             summary: 管理员登录
             tags: [1. 登录模块]
-            description: 管理员通过用户名密码登录系统，成功后返回token
             requestBody:
                 required: true
                 content:
@@ -345,54 +320,30 @@ paths:
                             $ref: "#/components/schemas/AdminLoginDTO"
             responses:
                 "200":
-                    description: 登录成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 登录成功
-                                data:
-                                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                "400":
-                    description: 用户名或密码错误
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 用户名或密码错误
-                                data: {}
 
     /logout:
         post:
             summary: 退出登录
             tags: [1. 登录模块]
-            description: 学生/管理员退出登录，销毁token
             security:
                 - tokenAuth: []
             responses:
                 "200":
-                    description: 退出成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 退出登录成功
-                                data: {}
 
-    # ==============================================
-    # 【2】学生用户专用模块 —— 只有学生能访问
-    # ==============================================
     /user/register:
         post:
             summary: 用户注册
             tags: [2. 学生用户专用]
-            description: 学生用户注册账号，用户名需唯一
             requestBody:
                 required: true
                 content:
@@ -401,53 +352,30 @@ paths:
                             $ref: "#/components/schemas/UserRegisterDTO"
             responses:
                 "200":
-                    description: 注册成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 注册成功
-                                data: {}
-                "400":
-                    description: 用户名已存在
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 用户名已存在
-                                data: {}
 
     /user/info:
         get:
             summary: 获取当前用户信息
             tags: [2. 学生用户专用]
-            description: 根据token获取当前登录学生的个人信息
             security:
                 - tokenAuth: []
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    username: "student001"
-                                    name: "张三"
-                                    phone: "13800138000"
 
     /user/update/info:
         post:
             summary: 修改个人资料
             tags: [2. 学生用户专用]
-            description: 学生修改姓名/手机号等个人资料
             security:
                 - tokenAuth: []
             requestBody:
@@ -458,21 +386,16 @@ paths:
                             $ref: "#/components/schemas/UserUpdateInfoDTO"
             responses:
                 "200":
-                    description: 修改成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 修改个人资料成功
-                                data: {}
 
     /user/update/pwd:
         post:
             summary: 修改密码
             tags: [2. 学生用户专用]
-            description: 学生修改登录密码，需验证原密码
             security:
                 - tokenAuth: []
             requestBody:
@@ -483,31 +406,16 @@ paths:
                             $ref: "#/components/schemas/UserUpdatePwdDTO"
             responses:
                 "200":
-                    description: 修改成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 修改密码成功
-                                data: {}
-                "400":
-                    description: 原密码错误
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 原密码错误
-                                data: {}
 
     /reservation/add:
         post:
             summary: 预约座位
             tags: [2. 学生用户专用]
-            description: 学生预约指定自习室的座位，需确保座位未被预约
             security:
                 - tokenAuth: []
             requestBody:
@@ -523,177 +431,107 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 预约成功
-                                data:
-                                    reservationId: 1001
-                "400":
-                    description: 座位已被预约
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 该座位已被预约，请选择其他座位
-                                data: {}
 
     /reservation/my:
         get:
             summary: 我的预约
             tags: [2. 学生用户专用]
-            description: 获取当前登录学生的所有预约记录（支持筛选和分页）
             security:
                 - tokenAuth: []
             parameters:
                 - name: reserveDate
                   in: query
                   required: false
-                  description: 预约日期
                   schema:
                       type: string
                       format: date
                 - name: status
                   in: query
                   required: false
-                  description: 预约状态（未开始/进行中/已结束/已取消）
                   schema:
                       type: string
                 - name: pageNum
                   in: query
                   required: false
-                  description: 页码
                   schema:
                       type: integer
-                      default: 1
                 - name: pageSize
                   in: query
                   required: false
-                  description: 每页数量
                   schema:
                       type: integer
-                      default: 10
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    total: 1
-                                    records:
-                                        - id: 1001
-                                          roomId: "room001"
-                                          seatId: 10
-                                          reserveDate: "2024-05-20"
-                                          startTime: "09:00:00"
-                                          endTime: "11:00:00"
-                                          status: "未开始"
 
     /reservation/cancel/{id}:
         post:
             summary: 取消我的预约
             tags: [2. 学生用户专用]
-            description: 学生取消自己的预约（仅限未开始的预约）
             security:
                 - tokenAuth: []
             parameters:
                 - name: id
                   in: path
                   required: true
-                  description: 预约记录ID
                   schema:
                       type: integer
-                      example: 1001
             responses:
                 "200":
-                    description: 取消成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 取消预约成功
-                                data: {}
 
-    # ==============================================
-    # 【3】管理员专用模块 —— 只有管理员能访问
-    # ==============================================
     /admin/user/list:
         get:
             summary: 查看所有用户
             tags: [3. 管理员专用]
-            description: 管理员查看系统内所有学生用户信息（支持筛选和分页）
             security:
                 - tokenAuth: []
             parameters:
                 - name: username
                   in: query
                   required: false
-                  description: 用户名（模糊查询）
                   schema:
                       type: string
                 - name: name
                   in: query
                   required: false
-                  description: 姓名（模糊查询）
                   schema:
                       type: string
                 - name: phone
                   in: query
                   required: false
-                  description: 手机号（模糊查询）
                   schema:
                       type: string
                 - name: pageNum
                   in: query
                   required: false
-                  description: 页码
                   schema:
                       type: integer
-                      default: 1
                 - name: pageSize
                   in: query
                   required: false
-                  description: 每页数量
                   schema:
                       type: integer
-                      default: 10
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    total: 2
-                                    records:
-                                        - id: 1
-                                          username: "student001"
-                                          name: "张三"
-                                          phone: "13800138000"
-                                          createTime: "2024-01-01 10:00:00"
-                                        - id: 2
-                                          username: "student002"
-                                          name: "李四"
-                                          phone: "13900139000"
-                                          createTime: "2024-01-02 10:00:00"
 
     /admin/room/add:
         post:
             summary: 添加自习室
             tags: [3. 管理员专用]
-            description: 管理员添加新的自习室信息
             security:
                 - tokenAuth: []
             requestBody:
@@ -704,68 +542,36 @@ paths:
                             $ref: "#/components/schemas/RoomAddDTO"
             responses:
                 "200":
-                    description: 添加成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 添加自习室成功
-                                data: {}
-                "400":
-                    description: 自习室编号已存在
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 自习室编号已存在
-                                data: {}
 
     /admin/room/delete/{roomId}:
         post:
             summary: 删除自习室
             tags: [3. 管理员专用]
-            description: 管理员删除指定编号的自习室（需确保无未结束的预约）
             security:
                 - tokenAuth: []
             parameters:
                 - name: roomId
                   in: path
                   required: true
-                  description: 自习室编号
                   schema:
                       type: string
-                      example: "room001"
             responses:
                 "200":
-                    description: 删除成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 删除自习室成功
-                                data: {}
-                "400":
-                    description: 自习室存在未结束预约，无法删除
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-                            example:
-                                code: 0
-                                msg: 该自习室存在未结束的预约，无法删除
-                                data: {}
 
     /admin/seat/add:
         post:
             summary: 添加座位
             tags: [3. 管理员专用]
-            description: 管理员为指定自习室批量生成座位（按totalSeats数量）
             security:
                 - tokenAuth: []
             requestBody:
@@ -776,31 +582,26 @@ paths:
                             $ref: "#/components/schemas/SeatAddDTO"
             responses:
                 "200":
-                    description: 添加成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 为自习室添加座位成功
-                                data: {}
 
     /admin/seat/delete/{seatId}:
         post:
             summary: 删除座位
             tags: [3. 管理员专用]
-            description: 管理员删除指定座位（需确保无未结束的预约）
             security:
                 - tokenAuth: []
             parameters:
                 - name: seatId
                   in: path
                   required: true
-                  description: 座位编号
+                  description: 座位编号（如4401_01）
                   schema:
-                      type: integer
-                      example: 10
+                      type: string
+                      example: "4401_01"
             responses:
                 "200":
                     description: 删除成功
@@ -808,106 +609,72 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 删除座位成功
-                                data: {}
 
     /admin/reservation/list:
         get:
             summary: 查看全部预约
             tags: [3. 管理员专用]
-            description: 管理员查看系统内所有预约记录（支持筛选和分页）
             security:
                 - tokenAuth: []
             parameters:
                 - name: username
                   in: query
                   required: false
-                  description: 用户名（模糊查询）
                   schema:
                       type: string
                 - name: reserveDate
                   in: query
                   required: false
-                  description: 预约日期
                   schema:
                       type: string
                       format: date
                 - name: status
                   in: query
                   required: false
-                  description: 预约状态（未开始/进行中/已结束/已取消）
                   schema:
                       type: string
                 - name: pageNum
                   in: query
                   required: false
-                  description: 页码
                   schema:
                       type: integer
-                      default: 1
                 - name: pageSize
                   in: query
                   required: false
-                  description: 每页数量
                   schema:
                       type: integer
-                      default: 10
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    total: 1
-                                    records:
-                                        - id: 1001
-                                          username: "student001"
-                                          roomId: "room001"
-                                          seatId: 10
-                                          reserveDate: "2024-05-20"
-                                          startTime: "09:00:00"
-                                          endTime: "11:00:00"
-                                          status: "未开始"
 
     /admin/reservation/forceCancel/{id}:
         post:
             summary: 强制取消预约
             tags: [3. 管理员专用]
-            description: 管理员强制取消任意预约记录
             security:
                 - tokenAuth: []
             parameters:
                 - name: id
                   in: path
                   required: true
-                  description: 预约记录ID
                   schema:
                       type: integer
-                      example: 1001
             responses:
                 "200":
-                    description: 取消成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 强制取消预约成功
-                                data: {}
 
     /admin/notice/add:
         post:
             summary: 发布公告
             tags: [3. 管理员专用]
-            description: 管理员发布系统公告
             security:
                 - tokenAuth: []
             requestBody:
@@ -918,140 +685,94 @@ paths:
                             $ref: "#/components/schemas/NoticeAddDTO"
             responses:
                 "200":
-                    description: 发布成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 发布公告成功
-                                data: {}
 
     /admin/notice/delete/{id}:
         post:
             summary: 删除公告
             tags: [3. 管理员专用]
-            description: 管理员删除指定公告
             security:
                 - tokenAuth: []
             parameters:
                 - name: id
                   in: path
                   required: true
-                  description: 公告ID
                   schema:
                       type: integer
-                      example: 1
             responses:
                 "200":
-                    description: 删除成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 删除公告成功
-                                data: {}
 
-    # ==============================================
-    # 【4】公共开放模块 —— 不需要登录 所有人可看
-    # ==============================================
     /room/list:
         get:
             summary: 自习室列表
             tags: [4. 公共开放模块]
-            description: 查看所有自习室的基础信息（支持筛选和分页）
             parameters:
                 - name: roomName
                   in: query
                   required: false
-                  description: 自习室名称（模糊查询）
                   schema:
                       type: string
                 - name: location
                   in: query
                   required: false
-                  description: 自习室位置（模糊查询）
                   schema:
                       type: string
                 - name: pageNum
                   in: query
                   required: false
-                  description: 页码
                   schema:
                       type: integer
-                      default: 1
                 - name: pageSize
                   in: query
                   required: false
-                  description: 每页数量
                   schema:
                       type: integer
-                      default: 10
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    total: 1
-                                    records:
-                                        - roomId: "room001"
-                                          roomName: "第一教学楼101室"
-                                          location: "第一教学楼1层"
-                                          totalSeats: 50
 
     /room/detail/{roomId}:
         get:
             summary: 自习室详情
             tags: [4. 公共开放模块]
-            description: 查看指定自习室的详细信息（含开放时间、座位数等）
             parameters:
                 - name: roomId
                   in: path
                   required: true
-                  description: 自习室编号
                   schema:
                       type: string
-                      example: "room001"
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    roomId: "room001"
-                                    roomName: "第一教学楼101室"
-                                    location: "第一教学楼1层"
-                                    totalSeats: 50
-                                    openTime: "08:00:00"
-                                    closeTime: "22:00:00"
 
     /seat/list/{roomId}:
         get:
             summary: 查看座位
             tags: [4. 公共开放模块]
-            description: 查看指定自习室的所有座位及预约状态
             parameters:
                 - name: roomId
                   in: path
                   required: true
-                  description: 自习室编号
                   schema:
                       type: string
-                      example: "room001"
+                      example: "4401"
             responses:
                 "200":
                     description: 获取成功
@@ -1064,51 +785,35 @@ paths:
                                 msg: 获取成功
                                 data:
                                     list:
-                                        - seatId: 10
-                                          status: "未预约"
-                                        - seatId: 11
+                                        - seatId: "4401_01"
+                                          status: "空闲"
+                                        - seatId: "4401_02"
                                           status: "已预约"
 
     /notice/list:
         get:
             summary: 公告列表
             tags: [4. 公共开放模块]
-            description: 查看系统所有公告（支持筛选和分页）
             parameters:
                 - name: title
                   in: query
                   required: false
-                  description: 公告标题（模糊查询）
                   schema:
                       type: string
                 - name: pageNum
                   in: query
                   required: false
-                  description: 页码
                   schema:
                       type: integer
-                      default: 1
                 - name: pageSize
                   in: query
                   required: false
-                  description: 每页数量
                   schema:
                       type: integer
-                      default: 10
             responses:
                 "200":
-                    description: 获取成功
+                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    total: 1
-                                    records:
-                                        - id: 1
-                                          title: "五一自习室开放调整通知"
-                                          content: "五一期间（5.1-5.3）自习室开放时间为09:00-20:00，望周知。"
-                                          createTime: "2024-04-20 10:00:00"
