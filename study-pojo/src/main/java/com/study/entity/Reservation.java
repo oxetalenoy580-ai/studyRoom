@@ -16,7 +16,7 @@ public class Reservation implements Serializable {
   private Integer id;
   private String roomId;
   private String userName;
-  private Integer seatId;
+  private String seatId;
   private LocalDateTime reserveDate;
   private LocalDateTime startDate;
   private LocalDateTime endDate;
