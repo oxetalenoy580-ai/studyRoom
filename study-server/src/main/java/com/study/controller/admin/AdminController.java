@@ -32,9 +32,11 @@ public class AdminController {
   }
 
   @PostMapping("/room/add")
+  @Operation(summary = "新增自习室")
   public Result addRoom(@RequestBody RoomAddDTO roomAddDTO) {
     log.info("新增自习室：{}", roomAddDTO);
     adminService.addRoom(roomAddDTO);
+    // TODO 座位关联逻辑
     return Result.success();
   }
 }
