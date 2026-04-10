@@ -26,7 +26,7 @@ public class LoginServiceImpl implements LoginService {
     if (!encryptedPassword.equals(user.getPassword())) {
       throw new RuntimeException("密码错误");
     }
-    return JwtUtil.createToken(user.getId(), user.getUsername());
+    return JwtUtil.createToken(user.getUsername(), user.getUsername());
   }
 
   @Override
@@ -39,7 +39,7 @@ public class LoginServiceImpl implements LoginService {
     if (!encryptedPassword.equals(admin.getPassword())) {
       throw new RuntimeException("密码错误");
     }
-    return JwtUtil.createToken(admin.getId(), admin.getUsername());
+    return JwtUtil.createToken(admin.getUsername(), admin.getUsername());
   }
 }
 

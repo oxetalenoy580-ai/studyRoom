@@ -1,21 +1,18 @@
-package com.study.entity;
+package com.study.vo;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class User implements Serializable {
+public class UserVO implements Serializable {
   private static final long serialVersionUID = 1L;
+
   private String username;
-  private String password;
+
   private String name;
+
   private String phone;
+
   private LocalDateTime createTime;
 }

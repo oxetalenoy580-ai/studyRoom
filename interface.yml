@@ -198,6 +198,49 @@ components:
                 - openTime
                 - closeTime
 
+        RoomUpdateDTO:
+            type: object
+            description: 管理员修改自习室参数
+            properties:
+                roomId:
+                    type: string
+                    description: 自习室编号（不可修改）
+                    example: "4401"
+                roomName:
+                    type: string
+                    description: 自习室名称
+                    example: "第一教学楼102室"
+                location:
+                    type: string
+                    description: 自习室位置
+                    example: "第一教学楼2层"
+                totalSeats:
+                    type: integer
+                    description: 总座位数
+                    example: 60
+                openTime:
+                    type: string
+                    format: time
+                    description: 开放时间
+                    example: "07:00:00"
+                closeTime:
+                    type: string
+                    format: time
+                    description: 关闭时间
+                    example: "23:00:00"
+                status:
+                    type: string
+                    description: 自习室状态（可用/禁用）
+                    example: "可用"
+            required:
+                - roomId
+                - roomName
+                - location
+                - totalSeats
+                - openTime
+                - closeTime
+                - status
+
         SeatAddDTO:
             type: object
             description: 管理员为自习室添加座位参数
@@ -543,6 +586,29 @@ paths:
             responses:
                 "200":
                     description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Result"
+
+    # ======================
+    # ✅ 新增：修改自习室接口
+    # ======================
+    /admin/room/update:
+        post:
+            summary: 修改自习室信息
+            tags: [3. 管理员专用]
+            security:
+                - tokenAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/RoomUpdateDTO"
+            responses:
+                "200":
+                    description: 修改成功
                     content:
                         application/json:
                             schema:

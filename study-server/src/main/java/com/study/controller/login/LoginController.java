@@ -19,22 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "登录模块")
 public class LoginController {
 
-  @Autowired LoginService loginService;
+    @Autowired
+    LoginService loginService;
 
-  @PostMapping("/user")
-  @Operation(summary = "学生登录")
-  public Result<String> userLogin(@RequestBody UserLoginDTO loginDTO) {
-    log.info("学生登录: {}", loginDTO.getUsername());
-    String token = loginService.userLogin(loginDTO);
-    return Result.success(token);
-  }
+    @PostMapping("/user")
+    @Operation(summary = "学生登录")
+    public Result<String> userLogin(@RequestBody UserLoginDTO loginDTO) {
+        log.info("学生登录: {}", loginDTO.getUsername());
+        String token = loginService.userLogin(loginDTO);
+        return Result.success(token);
+    }
 
-  @PostMapping("/admin")
-  @Operation(summary = "管理员登录")
-  public Result<String> adminLogin(@RequestBody AdminLoginDTO loginDTO) {
-    log.info("管理员登录: {}", loginDTO.getUsername());
-    String token = loginService.adminLogin(loginDTO);
-    return Result.success(token);
-  }
+    @PostMapping("/admin")
+    @Operation(summary = "管理员登录")
+    public Result<String> adminLogin(@RequestBody AdminLoginDTO loginDTO) {
+        log.info("管理员登录: {}", loginDTO.getUsername());
+        String token = loginService.adminLogin(loginDTO);
+        return Result.success(token);
+    }
 }
-

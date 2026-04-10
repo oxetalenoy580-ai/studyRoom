@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableCaching
 @EnableScheduling
 public class StudyApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(StudyApplication.class, args);
-        log.info("server started");
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(StudyApplication.class, args);
+    log.info("server started");
+  }
 }
