@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-    title: 校园自习室预约系统
+    title: 校园自习室预约系统 - 最终清晰版接口文档
     description: 严格按角色拆分接口 | 学生接口 / 管理员接口 / 公共接口
     version: 1.0.0
 servers:
-    - url: http://localhost:8080
+    - url: http://localhost:8080/api
       description: 本地开发环境
 
 components:
@@ -13,339 +13,146 @@ components:
             type: apiKey
             in: header
             name: token
-            description: 用户登录后返回的身份令牌
 
     schemas:
         Result:
             type: object
-            description: 统一返回结果格式
             properties:
                 code:
                     type: integer
-                    description: 响应码（1成功 / 0失败）
                     example: 1
                 msg:
                     type: string
-                    description: 响应提示信息
                     example: 操作成功
                 data:
                     type: object
-                    description: 响应数据体（按需返回）
-                    example: {}
             required:
                 - code
 
+        # 登录
         UserLoginDTO:
             type: object
-            description: 学生登录请求参数
             properties:
                 username:
                     type: string
-                    description: 学生用户名
-                    example: "student001"
                 password:
                     type: string
-                    description: 学生密码
-                    example: "123456"
             required: [username, password]
 
         AdminLoginDTO:
             type: object
-            description: 管理员登录请求参数
             properties:
                 username:
                     type: string
-                    description: 管理员用户名
-                    example: "admin001"
                 password:
                     type: string
-                    description: 管理员密码
-                    example: "admin123"
             required: [username, password]
 
-        UserQueryDTO:
-            type: object
-            description: 用户查询条件
-            properties:
-                username:
-                    type: string
-                    description: 用户名（模糊查询）
-                    example: "student"
-                name:
-                    type: string
-                    description: 姓名（模糊查询）
-                    example: "张"
-                phone:
-                    type: string
-                    description: 手机号（模糊查询）
-                    example: "138"
-                pageNum:
-                    type: integer
-                    description: 页码
-                    example: 1
-                pageSize:
-                    type: integer
-                    description: 每页数量
-                    example: 10
-
+        # 用户
         UserRegisterDTO:
             type: object
-            description: 学生注册请求参数
             properties:
                 username:
                     type: string
-                    description: 注册用户名
-                    example: "student002"
                 password:
                     type: string
-                    description: 注册密码
-                    example: "123456"
                 name:
                     type: string
-                    description: 学生真实姓名
-                    example: "张三"
                 phone:
                     type: string
-                    description: 手机号（选填）
-                    example: "13800138000"
             required: [username, password, name]
 
         UserUpdateInfoDTO:
             type: object
-            description: 学生修改个人资料参数
             properties:
                 name:
                     type: string
-                    description: 学生真实姓名
-                    example: "张三三"
                 phone:
                     type: string
-                    description: 手机号
-                    example: "13900139000"
             required: [name]
 
         UserUpdatePwdDTO:
             type: object
-            description: 学生修改密码参数
             properties:
                 oldPwd:
                     type: string
-                    description: 原密码
-                    example: "123456"
                 newPwd:
                     type: string
-                    description: 新密码
-                    example: "654321"
             required: [oldPwd, newPwd]
 
-        ReservationQueryDTO:
-            type: object
-            description: 预约查询条件
-            properties:
-                reserveDate:
-                    type: string
-                    format: date
-                    description: 预约日期
-                    example: "2024-05-20"
-                status:
-                    type: string
-                    description: 预约状态（未开始/进行中/已结束/已取消）
-                    example: "未开始"
-                pageNum:
-                    type: integer
-                    description: 页码
-                    example: 1
-                pageSize:
-                    type: integer
-                    description: 每页数量
-                    example: 10
-
+        # 自习室
         RoomAddDTO:
             type: object
-            description: 管理员添加自习室参数
             properties:
                 roomId:
                     type: string
-                    description: 自习室编号
-                    example: "4401"
                 roomName:
                     type: string
-                    description: 自习室名称
-                    example: "第一教学楼101室"
                 location:
                     type: string
-                    description: 自习室位置
-                    example: "第一教学楼1层"
                 totalSeats:
                     type: integer
-                    description: 总座位数
-                    example: 50
                 openTime:
                     type: string
                     format: time
-                    description: 开放时间
-                    example: "08:00:00"
                 closeTime:
                     type: string
                     format: time
-                    description: 关闭时间
-                    example: "22:00:00"
             required:
-                - roomId
-                - roomName
-                - location
-                - totalSeats
-                - openTime
-                - closeTime
+                [roomId, roomName, location, totalSeats, openTime, closeTime]
 
-        RoomUpdateDTO:
-            type: object
-            description: 管理员修改自习室参数
-            properties:
-                roomId:
-                    type: string
-                    description: 自习室编号（不可修改）
-                    example: "4401"
-                roomName:
-                    type: string
-                    description: 自习室名称
-                    example: "第一教学楼102室"
-                location:
-                    type: string
-                    description: 自习室位置
-                    example: "第一教学楼2层"
-                totalSeats:
-                    type: integer
-                    description: 总座位数
-                    example: 60
-                openTime:
-                    type: string
-                    format: time
-                    description: 开放时间
-                    example: "07:00:00"
-                closeTime:
-                    type: string
-                    format: time
-                    description: 关闭时间
-                    example: "23:00:00"
-                status:
-                    type: string
-                    description: 自习室状态（可用/禁用）
-                    example: "可用"
-            required:
-                - roomId
-                - roomName
-                - location
-                - totalSeats
-                - openTime
-                - closeTime
-                - status
-
+        # 座位
         SeatAddDTO:
             type: object
-            description: 管理员为自习室添加座位参数
             properties:
                 roomId:
                     type: string
-                    description: 自习室编号
-                    example: "4401"
             required: [roomId]
 
-        RoomQueryDTO:
-            type: object
-            description: 自习室查询条件
-            properties:
-                roomName:
-                    type: string
-                    description: 自习室名称（模糊查询）
-                    example: "101"
-                location:
-                    type: string
-                    description: 自习室位置（模糊查询）
-                    example: "第一教学楼"
-                pageNum:
-                    type: integer
-                    description: 页码
-                    example: 1
-                pageSize:
-                    type: integer
-                    description: 每页数量
-                    example: 10
-
+        # 预约
         ReservationAddDTO:
             type: object
-            description: 学生预约座位参数
             properties:
                 roomId:
                     type: string
-                    description: 自习室编号
-                    example: "4401"
                 seatId:
-                    type: string
-                    description: 座位编号（如4401_01）
-                    example: "4401_01"
+                    type: integer
                 reserveDate:
                     type: string
                     format: date
-                    description: 预约日期
-                    example: "2024-05-20"
                 startTime:
                     type: string
                     format: time
-                    description: 预约开始时间
-                    example: "09:00:00"
                 endTime:
                     type: string
                     format: time
-                    description: 预约结束时间
-                    example: "11:00:00"
             required: [roomId, seatId, reserveDate, startTime, endTime]
 
+        # 公告
         NoticeAddDTO:
             type: object
-            description: 管理员发布公告参数
             properties:
                 title:
                     type: string
-                    description: 公告标题
-                    example: "五一自习室开放调整通知"
                 content:
                     type: string
-                    description: 公告内容
-                    example: "五一期间（5.1-5.3）自习室开放时间为09:00-20:00，望周知。"
             required: [title, content]
 
-        NoticeQueryDTO:
-            type: object
-            description: 公告查询条件
-            properties:
-                title:
-                    type: string
-                    description: 公告标题（模糊查询）
-                    example: "五一"
-                pageNum:
-                    type: integer
-                    description: 页码
-                    example: 1
-                pageSize:
-                    type: integer
-                    description: 每页数量
-                    example: 10
-
 paths:
+    # ==============================================
+    # 【1】登录模块 —— 学生/管理员通用
+    # ==============================================
     /login/user:
         post:
             summary: 学生登录
             tags: [1. 登录模块]
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/UserLoginDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -356,14 +163,12 @@ paths:
             summary: 管理员登录
             tags: [1. 登录模块]
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/AdminLoginDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -377,25 +182,25 @@ paths:
                 - tokenAuth: []
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
 
+    # ==============================================
+    # 【2】学生用户专用模块 —— 只有学生能访问
+    # ==============================================
     /user/register:
         post:
             summary: 用户注册
             tags: [2. 学生用户专用]
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/UserRegisterDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -409,7 +214,6 @@ paths:
                 - tokenAuth: []
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -422,14 +226,12 @@ paths:
             security:
                 - tokenAuth: []
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/UserUpdateInfoDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -442,14 +244,12 @@ paths:
             security:
                 - tokenAuth: []
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/UserUpdatePwdDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -462,14 +262,12 @@ paths:
             security:
                 - tokenAuth: []
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/ReservationAddDTO"
             responses:
                 "200":
-                    description: 预约成功
                     content:
                         application/json:
                             schema:
@@ -481,31 +279,8 @@ paths:
             tags: [2. 学生用户专用]
             security:
                 - tokenAuth: []
-            parameters:
-                - name: reserveDate
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                      format: date
-                - name: status
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: pageNum
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
-                - name: pageSize
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -525,47 +300,22 @@ paths:
                       type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
 
+    # ==============================================
+    # 【3】管理员专用模块 —— 只有管理员能访问
+    # ==============================================
     /admin/user/list:
         get:
             summary: 查看所有用户
             tags: [3. 管理员专用]
             security:
                 - tokenAuth: []
-            parameters:
-                - name: username
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: name
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: phone
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: pageNum
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
-                - name: pageSize
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -578,37 +328,12 @@ paths:
             security:
                 - tokenAuth: []
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/RoomAddDTO"
             responses:
                 "200":
-                    description: 成功
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Result"
-
-    # ======================
-    # ✅ 新增：修改自习室接口
-    # ======================
-    /admin/room/update:
-        post:
-            summary: 修改自习室信息
-            tags: [3. 管理员专用]
-            security:
-                - tokenAuth: []
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/RoomUpdateDTO"
-            responses:
-                "200":
-                    description: 修改成功
                     content:
                         application/json:
                             schema:
@@ -628,7 +353,6 @@ paths:
                       type: string
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -641,14 +365,12 @@ paths:
             security:
                 - tokenAuth: []
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/SeatAddDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -664,13 +386,10 @@ paths:
                 - name: seatId
                   in: path
                   required: true
-                  description: 座位编号（如4401_01）
                   schema:
-                      type: string
-                      example: "4401_01"
+                      type: integer
             responses:
                 "200":
-                    description: 删除成功
                     content:
                         application/json:
                             schema:
@@ -682,36 +401,8 @@ paths:
             tags: [3. 管理员专用]
             security:
                 - tokenAuth: []
-            parameters:
-                - name: username
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: reserveDate
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                      format: date
-                - name: status
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: pageNum
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
-                - name: pageSize
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -731,7 +422,6 @@ paths:
                       type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -744,14 +434,12 @@ paths:
             security:
                 - tokenAuth: []
             requestBody:
-                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/NoticeAddDTO"
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -771,40 +459,20 @@ paths:
                       type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
 
+    # ==============================================
+    # 【4】公共开放模块 —— 不需要登录 所有人可看
+    # ==============================================
     /room/list:
         get:
             summary: 自习室列表
             tags: [4. 公共开放模块]
-            parameters:
-                - name: roomName
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: location
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: pageNum
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
-                - name: pageSize
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -822,7 +490,6 @@ paths:
                       type: string
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:
@@ -838,47 +505,19 @@ paths:
                   required: true
                   schema:
                       type: string
-                      example: "4401"
             responses:
                 "200":
-                    description: 获取成功
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Result"
-                            example:
-                                code: 1
-                                msg: 获取成功
-                                data:
-                                    list:
-                                        - seatId: "4401_01"
-                                          status: "空闲"
-                                        - seatId: "4401_02"
-                                          status: "已预约"
 
     /notice/list:
         get:
             summary: 公告列表
             tags: [4. 公共开放模块]
-            parameters:
-                - name: title
-                  in: query
-                  required: false
-                  schema:
-                      type: string
-                - name: pageNum
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
-                - name: pageSize
-                  in: query
-                  required: false
-                  schema:
-                      type: integer
             responses:
                 "200":
-                    description: 成功
                     content:
                         application/json:
                             schema:

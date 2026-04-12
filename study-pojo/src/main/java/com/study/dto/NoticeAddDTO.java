@@ -4,8 +4,9 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class SeatAddDTO implements Serializable {
+public class NoticeAddDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String roomId;
+    private String title;
+    private String content;
 }

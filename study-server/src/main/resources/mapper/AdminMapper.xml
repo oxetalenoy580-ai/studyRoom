@@ -19,4 +19,22 @@
     order by create_time desc
   </select>
 
+  <select id="listReservationVOs" resultType="com.study.vo.ReservationVO">
+    select r.id,
+           r.user_username,
+           u.name as user_name,
+           r.room_id,
+           rm.room_name,
+           r.seat_id,
+           r.reserve_date,
+           r.start_time,
+           r.end_time,
+           r.status,
+           r.create_time
+    from reservation r
+    left join user u on u.username = r.user_username
+    left join room rm on rm.room_id = r.room_id
+    order by r.create_time desc, r.id desc
+  </select>
+
 </mapper>

@@ -19,7 +19,7 @@
     </modules>
     <properties>
         <mybatis.spring>3.0.3</mybatis.spring>
-        <lombok>1.18.32</lombok>
+        <lombok>1.18.38</lombok>
         <fastjson>2.0.52</fastjson>
         <commons-lang>2.6</commons-lang>
         <druid>1.2.23</druid>
@@ -111,4 +111,26 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <release>17</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

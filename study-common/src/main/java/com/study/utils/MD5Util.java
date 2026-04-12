@@ -19,7 +19,7 @@ public class MD5Util {
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5加密失败", e);
+            throw new RuntimeException("MD5 encrypt failed", e);
         }
     }
 }

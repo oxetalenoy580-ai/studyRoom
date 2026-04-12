@@ -1,6 +1,7 @@
 package com.study.controller.login;
 
 import com.study.Result.Result;
+import com.study.controller.BaseController;
 import com.study.dto.AdminLoginDTO;
 import com.study.dto.UserLoginDTO;
 import com.study.service.LoginService;
@@ -10,31 +11,37 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-@RequestMapping("/login")
-@Tag(name = "登录模块")
-public class LoginController {
+@RequestMapping
+@Tag(name = "Login")
+public class LoginController extends BaseController {
 
     @Autowired
-    LoginService loginService;
+    private LoginService loginService;
 
-    @PostMapping("/user")
-    @Operation(summary = "学生登录")
+    @PostMapping("/login/user")
+    @Operation(summary = "User login")
     public Result<String> userLogin(@RequestBody UserLoginDTO loginDTO) {
-        log.info("学生登录: {}", loginDTO.getUsername());
-        String token = loginService.userLogin(loginDTO);
-        return Result.success(token);
+        log.info("User login: {}", loginDTO.getUsername());
+        return Result.success(loginService.userLogin(loginDTO));
     }
 
-    @PostMapping("/admin")
-    @Operation(summary = "管理员登录")
+    @PostMapping("/login/admin")
+    @Operation(summary = "Admin login")
     public Result<String> adminLogin(@RequestBody AdminLoginDTO loginDTO) {
-        log.info("管理员登录: {}", loginDTO.getUsername());
-        String token = loginService.adminLogin(loginDTO);
-        return Result.success(token);
+        log.info("Admin login: {}", loginDTO.getUsername());
+        return Result.success(loginService.adminLogin(loginDTO));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logout")
+    public Result<Void> logout(@RequestHeader(value = "token", required = false) String token) {
+        requireToken(token);
+        return Result.success();
     }
 }

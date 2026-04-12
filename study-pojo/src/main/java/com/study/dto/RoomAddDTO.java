@@ -1,7 +1,8 @@
 package com.study.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.Data;
 
 @Data
@@ -12,6 +13,10 @@ public class RoomAddDTO implements Serializable {
   private String roomName;
   private String location;
   private Integer totalSeats;
-  private LocalDateTime openTime;
-  private LocalDateTime closeTime;
+
+  @JsonFormat(pattern = "HH:mm:ss")
+  private LocalTime openTime;
+
+  @JsonFormat(pattern = "HH:mm:ss")
+  private LocalTime closeTime;
 }
