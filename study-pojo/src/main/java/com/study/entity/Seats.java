@@ -12,10 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Seats implements Serializable {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private Integer id;
-  private String roomId;
-  private Integer status;
-  private LocalDateTime createTime;
+    private String seatId;
+    private String roomId;
+    private Integer seatNumber;
+    private Integer status;
+    private LocalDateTime createTime;
 }

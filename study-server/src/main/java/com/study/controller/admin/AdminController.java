@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -37,7 +38,7 @@ public class AdminController extends BaseController {
     @GetMapping("/user/list")
     @Operation(summary = "List users")
     public Result<PageResult> getUserList(@RequestHeader(value = "token", required = false) String token,
-                                          UserQueryDTO queryDTO) {
+            UserQueryDTO queryDTO) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         return Result.success(adminService.getUserList(queryDTO));
     }
@@ -45,7 +46,7 @@ public class AdminController extends BaseController {
     @PostMapping("/room/add")
     @Operation(summary = "Add room")
     public Result<Void> addRoom(@RequestHeader(value = "token", required = false) String token,
-                                @RequestBody RoomAddDTO roomAddDTO) {
+            @RequestBody RoomAddDTO roomAddDTO) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.addRoom(roomAddDTO);
         return Result.success();
@@ -54,7 +55,7 @@ public class AdminController extends BaseController {
     @PostMapping("/room/delete/{roomId}")
     @Operation(summary = "Delete room")
     public Result<Void> deleteRoom(@RequestHeader(value = "token", required = false) String token,
-                                   @PathVariable String roomId) {
+            @PathVariable String roomId) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.deleteRoom(roomId);
         return Result.success();
@@ -63,16 +64,15 @@ public class AdminController extends BaseController {
     @GetMapping("/room/info/{roomId}")
     @Operation(summary = "Room detail")
     public Result<Room> getRoomInfo(@RequestHeader(value = "token", required = false) String token,
-                                    @PathVariable String roomId) {
+            @PathVariable String roomId) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         return Result.success(adminService.getRoomInfo(roomId));
     }
 
     @PostMapping("/room/update")
-<<<<<<< HEAD
     @Operation(summary = "Update room")
     public Result<Void> updateRoom(@RequestHeader(value = "token", required = false) String token,
-                                   @RequestBody RoomUpdateDTO roomUpdateDTO) {
+            @RequestBody RoomUpdateDTO roomUpdateDTO) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.updateRoom(roomUpdateDTO);
         return Result.success();
@@ -81,7 +81,7 @@ public class AdminController extends BaseController {
     @PostMapping("/seat/add")
     @Operation(summary = "Add seat")
     public Result<Void> addSeat(@RequestHeader(value = "token", required = false) String token,
-                                @RequestBody SeatAddDTO seatAddDTO) {
+            @RequestBody SeatAddDTO seatAddDTO) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.addSeatForRoom(seatAddDTO.getRoomId());
         return Result.success();
@@ -90,9 +90,9 @@ public class AdminController extends BaseController {
     @PostMapping("/seat/delete/{seatId}")
     @Operation(summary = "Delete seat")
     public Result<Void> deleteSeat(@RequestHeader(value = "token", required = false) String token,
-                                   @PathVariable Integer seatId) {
+            @PathVariable String seatId) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
-        adminService.deleteSeat(seatId);
+        adminService.deleteSeatForRoom(seatId);
         return Result.success();
     }
 
@@ -106,7 +106,7 @@ public class AdminController extends BaseController {
     @PostMapping("/reservation/forceCancel/{id}")
     @Operation(summary = "Force cancel reservation")
     public Result<Void> forceCancelReservation(@RequestHeader(value = "token", required = false) String token,
-                                               @PathVariable Integer id) {
+            @PathVariable Integer id) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.forceCancelReservation(id);
         return Result.success();
@@ -115,7 +115,7 @@ public class AdminController extends BaseController {
     @PostMapping("/notice/add")
     @Operation(summary = "Add notice")
     public Result<Void> addNotice(@RequestHeader(value = "token", required = false) String token,
-                                  @RequestBody NoticeAddDTO noticeAddDTO) {
+            @RequestBody NoticeAddDTO noticeAddDTO) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.addNotice(noticeAddDTO);
         return Result.success();
@@ -124,35 +124,9 @@ public class AdminController extends BaseController {
     @PostMapping("/notice/delete/{id}")
     @Operation(summary = "Delete notice")
     public Result<Void> deleteNotice(@RequestHeader(value = "token", required = false) String token,
-                                     @PathVariable Integer id) {
+            @PathVariable Integer id) {
         requireRole(token, StatuConstant.ROLE_ADMIN);
         adminService.deleteNotice(id);
         return Result.success();
     }
-=======
-    @Operation(summary = "修改自习室信息")
-    public Result<Room> updateRoom(@RequestBody RoomUpdateDTO roomUpdateDTO) {
-        log.info("修改自习室信息：{}", roomUpdateDTO);
-        adminService.updateRoom(roomUpdateDTO);
-        return Result.success();
-    }
-
-    @PostMapping("/seat/add")
-    @Operation(summary = "为自习室添加座位")
-    public Result addSeatForRoom(@RequestBody SeatAddDTO seatAddDTO) {
-        String roomId = seatAddDTO.getRoomId();
-        log.info("为自习室{}添加座位", roomId);
-        adminService.addSeatForRoom(roomId);
-        return Result.success();
-    }
-
-    @PostMapping("/seat/delete/{seatId}")
-    @Operation(summary = "为自习室删除座位")
-    public Result deleteSeatForRoom(@RequestParam String seatId) {
-        log.info("删除座位{}", seatId);
-        adminService.deleteSeatForRoom(seatId);
-        return Result.success();
-    }
-
->>>>>>> b81f9d5 (修复bug)
 }

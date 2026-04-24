@@ -41,9 +41,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public void addRoom(RoomAddDTO roomAddDTO) {
-<<<<<<< HEAD
         validateRoomRequest(roomAddDTO.getRoomId(), roomAddDTO.getRoomName(), roomAddDTO.getLocation(),
-            roomAddDTO.getTotalSeats(), roomAddDTO.getOpenTime(), roomAddDTO.getCloseTime());
+                roomAddDTO.getTotalSeats(), roomAddDTO.getOpenTime(), roomAddDTO.getCloseTime());
         if (adminMapper.countRoomByRoomId(roomAddDTO.getRoomId()) > 0) {
             throw new RuntimeException("Room id already exists");
         }
@@ -54,73 +53,48 @@ public class AdminServiceImpl implements AdminService {
         room.setFullStatus(StatuConstant.ROOM_NOT_FULL);
         adminMapper.addRoom(room);
 
-        for (int i = 0; i < roomAddDTO.getTotalSeats(); i++) {
-            adminMapper.addSeatForRoom(Seats.builder()
-                .roomId(roomAddDTO.getRoomId())
-                .status(StatuConstant.SEAT_AVAILABLE)
-                .build());
-        }
-        refreshRoomSeatSummary(roomAddDTO.getRoomId());
-=======
-        Room newRoom = new Room();
-        BeanUtils.copyProperties(roomAddDTO, newRoom);
-        newRoom.setStatus(StatuConstant.RoomEnabled);
-        newRoom.setFullStatus(0);
-        adminMapper.addRoom(newRoom);
-
         int totalSeats = roomAddDTO.getTotalSeats();
         for (int i = 1; i <= totalSeats; i++) {
             String seatId = roomAddDTO.getRoomId() + "_" + i;
-            Seats seat = new Seats(seatId, roomAddDTO.getRoomId(), i, StatuConstant.SeatIsNotRevered);
+            Seats seat = Seats.builder()
+                    .seatId(seatId)
+                    .roomId(roomAddDTO.getRoomId())
+                    .seatNumber(i)
+                    .status(StatuConstant.SEAT_AVAILABLE)
+                    .build();
             adminMapper.addSeatForRoom(seat);
         }
+        refreshRoomSeatSummary(roomAddDTO.getRoomId());
     }
 
     @Override
-    public void deleteRoom(String roomId) {
-        adminMapper.deleteSeatsByRoomId(roomId);
-        adminMapper.deleteRoom(roomId);
-    }
-
-    @Override
-    public void addSeatForRoom(String roomId) {
-        Room room = getRoomInfo(roomId);
-        int seatNumber = room.getTotalSeats() + 1;
-        String seatId = roomId + "_" + seatNumber;
-        Seats seat = new Seats(seatId, roomId, seatNumber, StatuConstant.SeatIsNotRevered);
-        adminMapper.addSeatForRoom(seat);
-
-        room.setTotalSeats(seatNumber);
-        RoomUpdateDTO roomUpdateDTO = new RoomUpdateDTO();
-        BeanUtils.copyProperties(room, roomUpdateDTO);
-        adminMapper.updateRoom(roomUpdateDTO);
-        updateRoomFullStatus(roomId);
-    }
-
-    @Override
+    @Transactional
     public void deleteSeatForRoom(String seatId) {
-        int find = seatId.indexOf("_");
-        String roomId = seatId.substring(0, find);
-        int deleteSeatNumber = Integer.parseInt(seatId.substring(find + 1));
+        String[] parts = seatId.split("_");
+        if (parts.length != 2) {
+            throw new RuntimeException("Invalid seat id format");
+        }
+        String roomId = parts[0];
+        int deleteSeatNumber = Integer.parseInt(parts[1]);
 
         Room room = getRoomInfo(roomId);
         int roomTotalSeat = room.getTotalSeats();
 
-        adminMapper.deleteSeatForRoom(seatId);
-
-        for (int i = deleteSeatNumber + 1; i <= roomTotalSeat; i++) {
-            String oldSeatId = roomId + "_" + i;
-            int newSeatNumber = i - 1;
+        List<Seats> seatsToUpdate = adminMapper.findSeatsAfter(roomId, deleteSeatNumber);
+        for (Seats seat : seatsToUpdate) {
+            int newSeatNumber = seat.getSeatNumber() - 1;
             String newSeatId = roomId + "_" + newSeatNumber;
-            adminMapper.updateSeat(oldSeatId, newSeatId, newSeatNumber);
+            adminMapper.updateSeat(seat.getSeatId(), newSeatId, newSeatNumber);
         }
+
+        adminMapper.deleteSeatForRoom(seatId);
 
         room.setTotalSeats(roomTotalSeat - 1);
         RoomUpdateDTO roomUpdateDTO = new RoomUpdateDTO();
-        BeanUtils.copyProperties(room, roomUpdateDTO);
+        roomUpdateDTO.setRoomId(roomId);
+        roomUpdateDTO.setTotalSeats(roomTotalSeat - 1);
         adminMapper.updateRoom(roomUpdateDTO);
         updateRoomFullStatus(roomId);
->>>>>>> b81f9d5 (修复bug)
     }
 
     @Override
@@ -135,7 +109,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public void deleteRoom(String roomId) {
-        getRoomInfo(roomId);
+        Room room = getRoomInfo(roomId);
+        int activeReservations = adminMapper.countActiveReservationsByRoomId(roomId);
+        if (activeReservations > 0) {
+            throw new RuntimeException("Cannot delete room with active reservations");
+        }
         adminMapper.deleteReservationsByRoomId(roomId);
         adminMapper.deleteSeatsByRoomId(roomId);
         adminMapper.deleteRoom(roomId);
@@ -144,11 +122,17 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public void addSeatForRoom(String roomId) {
-        getRoomInfo(roomId);
+        Room room = getRoomInfo(roomId);
+        int currentCount = adminMapper.countSeatsByRoomId(roomId);
+        int newSeatNumber = currentCount + 1;
+        String seatId = roomId + "_" + newSeatNumber;
+
         adminMapper.addSeatForRoom(Seats.builder()
-            .roomId(roomId)
-            .status(StatuConstant.SEAT_AVAILABLE)
-            .build());
+                .seatId(seatId)
+                .roomId(roomId)
+                .seatNumber(newSeatNumber)
+                .status(StatuConstant.SEAT_AVAILABLE)
+                .build());
         refreshRoomSeatSummary(roomId);
     }
 
@@ -169,8 +153,8 @@ public class AdminServiceImpl implements AdminService {
     public void updateRoom(RoomUpdateDTO roomUpdateDTO) {
         Room currentRoom = getRoomInfo(roomUpdateDTO.getRoomId());
         validateRoomRequest(roomUpdateDTO.getRoomId(), roomUpdateDTO.getRoomName(), roomUpdateDTO.getLocation(),
-            Math.max(adminMapper.countSeatsByRoomId(roomUpdateDTO.getRoomId()), 0),
-            roomUpdateDTO.getOpenTime(), roomUpdateDTO.getCloseTime());
+                Math.max(adminMapper.countSeatsByRoomId(roomUpdateDTO.getRoomId()), 0),
+                roomUpdateDTO.getOpenTime(), roomUpdateDTO.getCloseTime());
         if (roomUpdateDTO.getStatus() == null) {
             roomUpdateDTO.setStatus(currentRoom.getStatus());
         }
@@ -206,9 +190,9 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException("Notice title and content are required");
         }
         adminMapper.addNotice(Notice.builder()
-            .title(noticeAddDTO.getTitle())
-            .content(noticeAddDTO.getContent())
-            .build());
+                .title(noticeAddDTO.getTitle())
+                .content(noticeAddDTO.getContent())
+                .build());
     }
 
     @Override
@@ -221,7 +205,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private void validateRoomRequest(String roomId, String roomName, String location, Integer totalSeats,
-                                     LocalTime openTime, LocalTime closeTime) {
+            LocalTime openTime, LocalTime closeTime) {
         if (!StringUtils.hasText(roomId) || !StringUtils.hasText(roomName) || !StringUtils.hasText(location)) {
             throw new RuntimeException("Room information is incomplete");
         }
@@ -235,7 +219,8 @@ public class AdminServiceImpl implements AdminService {
 
     private void refreshSeatStatus(Integer seatId) {
         int pendingCount = adminMapper.countReservationsBySeatAndStatus(seatId, StatuConstant.RESERVATION_PENDING);
-        adminMapper.updateSeatStatus(seatId, pendingCount > 0 ? StatuConstant.SEAT_RESERVED : StatuConstant.SEAT_AVAILABLE);
+        adminMapper.updateSeatStatus(seatId,
+                pendingCount > 0 ? StatuConstant.SEAT_RESERVED : StatuConstant.SEAT_AVAILABLE);
     }
 
     private void refreshRoomSeatSummary(String roomId) {
@@ -253,9 +238,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void updateRoomFullStatus(String roomId) {
-        int reserved = adminMapper.countReservedSeats(roomId);
+        int available = adminMapper.countSeatsByRoomIdAndStatus(roomId, StatuConstant.SEAT_AVAILABLE);
         int total = adminMapper.getTotalSeats(roomId);
-        int fullStatus = (reserved >= total) ? StatuConstant.RoomIsFulled : StatuConstant.RoomIsNotFulled;
+        int fullStatus = (available == 0 && total > 0) ? StatuConstant.ROOM_FULL : StatuConstant.ROOM_NOT_FULL;
         adminMapper.updateRoomFullStatus(roomId, fullStatus);
     }
 

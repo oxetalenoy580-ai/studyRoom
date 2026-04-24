@@ -42,8 +42,9 @@ CREATE TABLE room (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='study room';
 
 CREATE TABLE seat (
-  id INT NOT NULL AUTO_INCREMENT COMMENT 'seat id',
-  room_id VARCHAR(10) NOT NULL COMMENT 'belong room id',
+  seat_id VARCHAR(20) NOT NULL COMMENT 'seat id',
+  room_id VARCHAR(20) NOT NULL COMMENT 'belong room id',
+  seat_number INT NOT NULL COMMENT 'seat number in room',
   status TINYINT NOT NULL DEFAULT 0 COMMENT '0 available, 1 reserved',
   create_time DATETIME DEFAULT NOW() COMMENT 'create time',
   PRIMARY KEY (id),

@@ -20,10 +20,7 @@ public interface AdminService {
 
     void addSeatForRoom(String roomId);
 
-<<<<<<< HEAD
     void deleteSeat(Integer seatId);
-
-    void updateRoom(RoomUpdateDTO roomUpdateDTO);
 
     List<ReservationVO> getReservationList();
 
@@ -32,11 +29,10 @@ public interface AdminService {
     void addNotice(NoticeAddDTO noticeAddDTO);
 
     void deleteNotice(Integer id);
-=======
+
     void updateRoom(RoomUpdateDTO roomuUpdateDTO);
 
     void deleteSeatForRoom(String seatId);
 
     void updateRoomFullStatus(String roomId);
->>>>>>> b81f9d5 (修复bug)
 }

@@ -44,7 +44,7 @@ public interface UserMapper {
         from reservation
         where seat_id = #{seatId}
           and reserve_date = #{reserveDate}
-          and status in (0, 1)
+          and status = 0
           and start_time < #{endTime}
           and end_time > #{startTime}
         """)
@@ -58,7 +58,7 @@ public interface UserMapper {
         from reservation
         where user_username = #{username}
           and reserve_date = #{reserveDate}
-          and status in (0, 1)
+          and status = 0
           and start_time < #{endTime}
           and end_time > #{startTime}
         """)

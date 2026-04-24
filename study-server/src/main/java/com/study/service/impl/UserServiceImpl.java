@@ -1,5 +1,6 @@
 package com.study.service.impl;
 
+import com.study.annotation.CheckRoomFull;
 import com.study.constant.StatuConstant;
 import com.study.dto.ReservationAddDTO;
 import com.study.dto.UserRegisterDTO;
@@ -81,6 +82,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CheckRoomFull(roomIdParam = "reservationAddDTO")
     public void addReservation(String username, ReservationAddDTO reservationAddDTO) {
         Room room = userMapper.getRoomById(reservationAddDTO.getRoomId());
         if (room == null || !StatuConstant.ROOM_ENABLED.equals(room.getStatus())) {
@@ -90,12 +92,15 @@ public class UserServiceImpl implements UserService {
         if (seat == null || !reservationAddDTO.getRoomId().equals(seat.getRoomId())) {
             throw new RuntimeException("Seat not found");
         }
+        if (!StatuConstant.SEAT_AVAILABLE.equals(seat.getStatus())) {
+            throw new RuntimeException("Seat is not available");
+        }
         if (reservationAddDTO.getReserveDate() == null || reservationAddDTO.getStartTime() == null
             || reservationAddDTO.getEndTime() == null) {
             throw new RuntimeException("Reservation time is required");
         }
-        if (reservationAddDTO.getReserveDate().isBefore(LocalDate.now())) {
-            throw new RuntimeException("Cannot reserve a past date");
+        if (reservationAddDTO.getReserveDate().isBefore(LocalDate.now().plusDays(1))) {
+            throw new RuntimeException("Cannot reserve for today or past dates");
         }
         if (!reservationAddDTO.getStartTime().isBefore(reservationAddDTO.getEndTime())) {
             throw new RuntimeException("Reservation time range is invalid");
@@ -160,7 +165,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean passwordMatches(String rawPassword, String dbPassword) {
-        return rawPassword.equals(dbPassword) || MD5Util.encrypt(rawPassword).equals(dbPassword);
+        return MD5Util.encrypt(rawPassword).equals(dbPassword);
     }
 
     private void refreshSeatStatus(Integer seatId) {

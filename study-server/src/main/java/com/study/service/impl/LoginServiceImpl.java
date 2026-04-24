@@ -52,6 +52,6 @@ public class LoginServiceImpl implements LoginService {
   }
 
   private boolean passwordMatches(String rawPassword, String dbPassword) {
-    return rawPassword.equals(dbPassword) || MD5Util.encrypt(rawPassword).equals(dbPassword);
+    return MD5Util.encrypt(rawPassword).equals(dbPassword);
   }
 }

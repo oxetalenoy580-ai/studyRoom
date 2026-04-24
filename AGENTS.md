@@ -4,7 +4,7 @@ This document provides guidelines for agentic coding agents working in this repo
 
 ## Project Overview
 
-- **Type**: Java Spring Boot 3.2.5 Multi-Module Maven Project
+- **Type**: Java 17 Spring Boot 3.2.5 Multi-Module Maven Project
 - **Modules**: study-common, study-pojo, study-server
 - **Package**: com.study
 - **Database**: MySQL with Druid connection pool
@@ -24,8 +24,11 @@ mvn clean install -pl study-server -am
 # Run application
 mvn spring-boot:run -pl study-server
 
-# Run single test
-mvn test -pl study-server -Dtest=TestClassName#testMethodName
+# Run specific test class
+mvn test -pl study-server -Dtest=UserServiceTest
+
+# Run specific test method
+mvn test -pl study-server -Dtest=UserServiceTest#testUserLogin
 
 # Run all tests in module
 mvn test -pl study-server
@@ -43,15 +46,29 @@ studyRoom/
 └── study-server/    # Controllers, Services, Mappers
 ```
 
-## Naming Conventions
+## Code Style
 
+### General Formatting
+- Indent: 4 spaces (no tabs)
+- Line length: 120 chars max
+- Open brace on same line: `if (condition) {`
+- One blank line between methods
+- No trailing whitespace
+
+### Naming Conventions
 - **Classes**: PascalCase (e.g., `UserController`, `LoginServiceImpl`)
 - **Methods**: camelCase (e.g., `userLogin`, `addRoom`)
 - **Variables**: camelCase (e.g., `userName`, `pageResult`)
 - **Constants**: UPPER_SNAKE_CASE (e.g., `STATUS_NORMAL`)
 - **Packages**: lowercase (e.g., `com.study.controller.admin`)
+- **Interfaces**: Add `Impl` suffix for implementation (e.g., `LoginService` + `LoginServiceImpl`)
 
-## Code Style
+### Import Organization
+Order imports (IDE should auto-organize):
+1. Java/JDK (java.*, javax.*)
+2. Spring (org.springframework.*)
+3. Third-party (lombok, mybatis, swagger, etc.)
+4. Project (com.study.*)
 
 ### Entity Classes
 ```java
@@ -70,33 +87,34 @@ public class User implements Serializable {
 - Implement `Serializable` with `serialVersionUID`
 
 ### Controller Layer
-- Use `@RestController`, `@RequestMapping`
-- Use `@Tag` + `@Operation` for Knife4j API docs
-- Use `@Slf4j` for logging
-- Always return `Result<T>`
-- Inject services via `@Autowired`
-
 ```java
 @RestController
 @RequestMapping("/admin")
 @Tag(name = "管理员接口")
-public class AdminController {
+@Slf4j
+public class AdminController extends BaseController {
     @Autowired private AdminService adminService;
 
     @GetMapping("/user/list")
     @Operation(summary = "查询用户列表")
-    public Result<PageResult> getUserList(UserQueryDTO queryDTO) {
+    public Result<PageResult> getUserList(
+            @RequestHeader(value = "token", required = false) String token,
+            UserQueryDTO queryDTO) {
+        requireRole(token, StatuConstant.ROLE_ADMIN);
         log.info("查询用户列表, 条件: {}", queryDTO);
         return Result.success(adminService.getUserList(queryDTO));
     }
 }
 ```
+- Use `@RestController`, `@RequestMapping`
+- Use `@Tag` + `@Operation` for Knife4j API docs
+- Use `@Slf4j` for logging
+- Always return `Result<T>`
+- Extend `BaseController` for auth utilities
+- Inject services via `@Autowired`
+- Use `@RequestHeader` for token extraction
 
 ### Service Layer
-- Use `@Service` with interface-based design
-- Use `@Autowired` for DI
-- Business logic + logging
-
 ```java
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -106,35 +124,55 @@ public class LoginServiceImpl implements LoginService {
     public String userLogin(UserLoginDTO loginDTO) {
         User user = loginMapper.findByUsername(loginDTO.getUsername());
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new BusinessException("用户不存在");
         }
         return JwtUtil.createToken(user.getUsername(), user.getUsername());
     }
 }
 ```
+- Use interface-based design with `@Service` implementation
+- Use `@Autowired` for DI
+- Business logic + logging
 
 ### Mapper Layer
 - Use `@Mapper` annotation or XML mappers
 - XML mappers: `src/main/resources/mapper/`
+- Follow MyBatis conventions
 
 ### DTO/VO Classes
-- Located in `study-pojo/src/main/java/com/study/dto/` and `vo/`
+- DTOs: request objects in `study-pojo/src/main/java/com/study/dto/`
+- VOs: response objects in `study-pojo/src/main/java/com/study/vo/`
 - Use Lombok annotations
-- DTOs = request, VOs = response
 
-## Imports Organization
+### Types Usage
+- Use primitive types when possible (`int` vs `Integer`)
+- Use `String` for text, avoid `char`
+- Use `LocalDateTime` for timestamps
+- Use `BigDecimal` for money/precision
+- Use `List` over `ArrayList` in interfaces
+- Avoid raw types: use `List<String>` not `List`
 
-Order imports:
-1. Java/JDK (java.*, javax.*)
-2. Spring (org.springframework.*)
-3. Third-party (lombok, mybatis, swagger, etc.)
-4. Project (com.study.*)
-
-## Error Handling
-
-- Use `RuntimeException` for business logic errors
-- Wrap responses: `Result.success(data)` or `Result.error(msg)`
+### Error Handling
+- Throw `BusinessException` (extends RuntimeException) for business errors
+- Use `Result.success(data)` or `Result.error(msg)` for responses
 - Log before operations: `log.info("...")` or `log.error("...", e)`
+- Global exception handler in `BaseController`
+
+### Validation
+- Use `@Valid` on request DTOs in controller parameters
+- Use `@NotNull`, `@NotBlank`, `@Size` etc. from jakarta.validation
+- Add validation messages in DTO fields
+
+### Transactions
+- Use `@Transactional` on service methods for DB operations
+- Default: rollback on RuntimeException
+- Use `@Transactional(readOnly = true)` for read-only queries
+
+### Logging
+- Use Lombok's `@Slf4j`
+- Log entry: `log.info("methodName: action")`
+- Log params: `log.info("action, param: {}", param)`
+- Log errors: `log.error("action failed", e)`
 
 ## API Documentation
 
@@ -151,10 +189,10 @@ Order imports:
 ## Key Dependencies
 
 | Library | Version |
-|----------|---------|
+|---------|---------|
 | Spring Boot | 3.2.5 |
 | MyBatis | 3.0.3 |
-| Lombok | 1.18.32 |
+| Lombok | 1.18.38 |
 | JWT (jjwt) | 0.12.5 |
 | Druid | 1.2.23 |
 | PageHelper | 2.1.0 |
@@ -164,5 +202,6 @@ Order imports:
 
 No tests currently exist. When adding tests:
 - Place in `src/test/java/` matching package structure
-- Use JUnit with Spring Boot Test
+- Use JUnit 5 with Spring Boot Test
 - Naming: `*Test.java` or `*Tests.java`
+- Follow naming: `testMethodName_Scenario_ExpectedBehavior`

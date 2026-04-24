@@ -48,7 +48,7 @@ public class UserController extends BaseController {
     @PostMapping("/user/update/info")
     @Operation(summary = "Update user info")
     public Result<Void> updateInfo(@RequestHeader(value = "token", required = false) String token,
-                                   @RequestBody UserUpdateInfoDTO updateInfoDTO) {
+            @RequestBody UserUpdateInfoDTO updateInfoDTO) {
         userService.updateUserInfo(requireRole(token, StatuConstant.ROLE_USER), updateInfoDTO);
         return Result.success();
     }
@@ -56,7 +56,7 @@ public class UserController extends BaseController {
     @PostMapping("/user/update/pwd")
     @Operation(summary = "Update password")
     public Result<Void> updatePwd(@RequestHeader(value = "token", required = false) String token,
-                                  @RequestBody UserUpdatePwdDTO updatePwdDTO) {
+            @RequestBody UserUpdatePwdDTO updatePwdDTO) {
         userService.updatePassword(requireRole(token, StatuConstant.ROLE_USER), updatePwdDTO);
         return Result.success();
     }
@@ -64,7 +64,7 @@ public class UserController extends BaseController {
     @PostMapping("/reservation/add")
     @Operation(summary = "Add reservation")
     public Result<Void> addReservation(@RequestHeader(value = "token", required = false) String token,
-                                       @RequestBody ReservationAddDTO reservationAddDTO) {
+            @RequestBody ReservationAddDTO reservationAddDTO) {
         userService.addReservation(requireRole(token, StatuConstant.ROLE_USER), reservationAddDTO);
         return Result.success();
     }
@@ -78,7 +78,7 @@ public class UserController extends BaseController {
     @PostMapping("/reservation/cancel/{id}")
     @Operation(summary = "Cancel reservation")
     public Result<Void> cancelReservation(@RequestHeader(value = "token", required = false) String token,
-                                          @PathVariable Integer id) {
+            @PathVariable Integer id) {
         userService.cancelReservation(requireRole(token, StatuConstant.ROLE_USER), id);
         return Result.success();
     }
