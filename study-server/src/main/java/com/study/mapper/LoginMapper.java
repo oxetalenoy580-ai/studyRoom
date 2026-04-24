@@ -8,9 +8,9 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface LoginMapper {
 
-  @Select("select * from admin where username = #{username}")
-  Admin findByAdminUsername(String username);
+    @Select("select * from admin where username = #{username}")
+    Admin findByAdminUsername(String username);
 
-  @Select("select * from user where username = #{username}")
-  User findByUsername(String username);
+    @Select("select * from user where username = #{username}")
+    User findByUsername(String username);
 }
