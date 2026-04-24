@@ -69,6 +69,7 @@ public class AdminController extends BaseController {
     }
 
     @PostMapping("/room/update")
+<<<<<<< HEAD
     @Operation(summary = "Update room")
     public Result<Void> updateRoom(@RequestHeader(value = "token", required = false) String token,
                                    @RequestBody RoomUpdateDTO roomUpdateDTO) {
@@ -128,4 +129,30 @@ public class AdminController extends BaseController {
         adminService.deleteNotice(id);
         return Result.success();
     }
+=======
+    @Operation(summary = "修改自习室信息")
+    public Result<Room> updateRoom(@RequestBody RoomUpdateDTO roomUpdateDTO) {
+        log.info("修改自习室信息：{}", roomUpdateDTO);
+        adminService.updateRoom(roomUpdateDTO);
+        return Result.success();
+    }
+
+    @PostMapping("/seat/add")
+    @Operation(summary = "为自习室添加座位")
+    public Result addSeatForRoom(@RequestBody SeatAddDTO seatAddDTO) {
+        String roomId = seatAddDTO.getRoomId();
+        log.info("为自习室{}添加座位", roomId);
+        adminService.addSeatForRoom(roomId);
+        return Result.success();
+    }
+
+    @PostMapping("/seat/delete/{seatId}")
+    @Operation(summary = "为自习室删除座位")
+    public Result deleteSeatForRoom(@RequestParam String seatId) {
+        log.info("删除座位{}", seatId);
+        adminService.deleteSeatForRoom(seatId);
+        return Result.success();
+    }
+
+>>>>>>> b81f9d5 (修复bug)
 }

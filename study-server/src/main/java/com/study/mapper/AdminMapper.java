@@ -12,7 +12,10 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+<<<<<<< HEAD
 import org.apache.ibatis.annotations.Options;
+=======
+>>>>>>> b81f9d5 (修复bug)
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -22,7 +25,15 @@ public interface AdminMapper {
 
     List<UserVO> queryUserList(UserQueryDTO queryDTO);
 
+<<<<<<< HEAD
     List<ReservationVO> listReservationVOs();
+=======
+    // Room
+    @Insert("insert into room (room_id, room_name, location, total_seats, open_time, close_time, status,"
+            + " full_status) values (#{roomId}, #{roomName}, #{location}, #{totalSeats}, #{openTime},"
+            + " #{closeTime}, #{status}, #{fullStatus})")
+    void addRoom(Room newRoom);
+>>>>>>> b81f9d5 (修复bug)
 
     @Select("select count(1) from room where room_id = #{roomId}")
     Integer countRoomByRoomId(String roomId);
@@ -39,6 +50,7 @@ public interface AdminMapper {
     @Delete("delete from room where room_id = #{roomId}")
     void deleteRoom(String roomId);
 
+<<<<<<< HEAD
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert("insert into seat (room_id, status, create_time) values (#{roomId}, #{status}, now())")
     void addSeatForRoom(Seats seat);
@@ -103,4 +115,35 @@ public interface AdminMapper {
 
     @Select("select count(1) from notice where id = #{id}")
     Integer countNoticeById(Integer id);
+=======
+    @Update("update room set room_name=#{roomName}, location=#{location}, total_seats=#{totalSeats}, open_time=#{openTime}, close_time=#{closeTime}, status=#{status} where room_id=#{roomId}")
+    void updateRoom(RoomUpdateDTO roomUpdateDTO);
+
+    @Update("update room set full_status = #{fullStatus} where room_id = #{roomId}")
+    void updateRoomFullStatus(@Param("roomId") String roomId, @Param("fullStatus") int fullStatus);
+
+    // Seats
+    @Delete("Delete from seats where room_id = #{roomId}")
+    void deleteSeatsByRoomId(String roomId);
+
+    @Insert("insert into seats (seat_id, room_id, seat_number, status) values (#{seatId}, #{roomId}, #{seatNumber}, #{status})")
+    void addSeatForRoom(Seats seat);
+
+    @Delete("Delete from seats where seat_id = #{seatId}")
+    void deleteSeatForRoom(String seatId);
+
+    @Select("select * from seats where room_id = #{roomId} and seat_number > #{seatNumber} order by seat_number")
+    List<Seats> findSeatsAfter(String roomId, Integer seatNumber);
+
+    @Update("update seats set seat_id = #{newSeatId}, seat_number = #{newSeatNumber} where seat_id = #{oldSeatId}")
+    void updateSeat(@Param("oldSeatId") String oldSeatId, @Param("newSeatId") String newSeatId,
+            @Param("newSeatNumber") int newSeatNumber);
+
+    @Select("select count(*) from seats where room_id = #{roomId} and status = 1")
+    int countReservedSeats(String roomId);
+
+    @Select("select total_seats from room where room_id = #{roomId}")
+    Integer getTotalSeats(String roomId);
+
+>>>>>>> b81f9d5 (修复bug)
 }
