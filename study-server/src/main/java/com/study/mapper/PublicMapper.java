@@ -16,7 +16,7 @@ public interface PublicMapper {
     @Select("select * from room where room_id = #{roomId} and status = 1")
     Room getRoomDetail(String roomId);
 
-    @Select("select * from seat where room_id = #{roomId} order by id asc")
+    @Select("select * from seat where room_id = #{roomId} order by seat_id asc")
     List<Seats> listSeatsByRoomId(String roomId);
 
     @Select("select * from notice order by create_time desc, id desc")

@@ -19,22 +19,40 @@
         order by create_time desc
     </select>
 
-    <select id="listReservationVOs" resultType="com.study.vo.ReservationVO">
-        select r.id,
-               r.user_username,
-               u.name as user_name,
-               r.room_id,
-               rm.room_name,
-               r.seat_id,
-               r.reserve_date,
-               r.start_time,
-               r.end_time,
-               r.status,
-               r.create_time
-        from reservation r
-        left join user u on u.username = r.user_username
-        left join room rm on rm.room_id = r.room_id
-        order by r.create_time desc, r.id desc
-    </select>
+<!-- 先定义 resultMap -->
+<resultMap id="ReservationVOResultMap" type="com.study.vo.ReservationVO">
+    <id column="id" property="id"/>
+    <result column="user_username" property="userUsername"/>
+    <result column="user_name" property="userName"/>
+    <result column="room_id" property="roomId"/>
+    <result column="room_name" property="roomName"/>
+    <result column="seat_id" property="seatId" jdbcType="VARCHAR"/> <!-- 强制指定 VARCHAR -->
+    <result column="reserve_date" property="reserveDate"/>
+    <result column="start_time" property="startTime"/>
+    <result column="end_time" property="endTime"/>
+    <result column="status" property="status"/>
+    <result column="create_time" property="createTime"/>
+</resultMap>
+
+<!-- 修改查询语句，使用 resultMap -->
+
+<select id="listReservationVOs" resultMap="ReservationVOResultMap">
+    select r.id,
+           r.user_username,
+           u.name as user_name,
+           r.room_id,
+           rm.room_name,
+           r.seat_id,
+           r.reserve_date,
+           r.start_time,
+           r.end_time,
+           r.status,
+           r.create_time
+    from reservation r
+    left join user u on u.username = r.user_username
+    left join room rm on rm.room_id = r.room_id
+    order by r.create_time desc, r.id desc
+</select>
+
 
 </mapper>

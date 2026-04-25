@@ -109,7 +109,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public void deleteRoom(String roomId) {
-        Room room = getRoomInfo(roomId);
+        getRoomInfo(roomId);
         int activeReservations = adminMapper.countActiveReservationsByRoomId(roomId);
         if (activeReservations > 0) {
             throw new RuntimeException("Cannot delete room with active reservations");
@@ -122,7 +122,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public void addSeatForRoom(String roomId) {
-        Room room = getRoomInfo(roomId);
+        getRoomInfo(roomId);
         int currentCount = adminMapper.countSeatsByRoomId(roomId);
         int newSeatNumber = currentCount + 1;
         String seatId = roomId + "_" + newSeatNumber;
@@ -138,7 +138,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteSeat(Integer seatId) {
+    public void deleteSeat(String seatId) {
         Seats seat = adminMapper.getSeatById(seatId);
         if (seat == null) {
             throw new RuntimeException("Seat not found");
@@ -179,7 +179,7 @@ public class AdminServiceImpl implements AdminService {
             return;
         }
         adminMapper.updateReservationStatus(id, StatuConstant.RESERVATION_CANCELED);
-        refreshSeatStatus(reservation.getSeatId());
+        refreshSeatStatus(String.valueOf(reservation.getSeatId()));
         refreshRoomFullStatus(reservation.getRoomId());
     }
 
@@ -217,7 +217,7 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    private void refreshSeatStatus(Integer seatId) {
+    private void refreshSeatStatus(String seatId) {
         int pendingCount = adminMapper.countReservationsBySeatAndStatus(seatId, StatuConstant.RESERVATION_PENDING);
         adminMapper.updateSeatStatus(seatId,
                 pendingCount > 0 ? StatuConstant.SEAT_RESERVED : StatuConstant.SEAT_AVAILABLE);

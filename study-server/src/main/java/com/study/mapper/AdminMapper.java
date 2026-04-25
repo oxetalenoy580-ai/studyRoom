@@ -40,23 +40,22 @@ public interface AdminMapper {
     void deleteRoom(String roomId);
 
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    @Insert("insert into seat (room_id, status, create_time) values (#{roomId}, #{status}, now())")
+    @Insert("insert into seat (seat_id, room_id, seat_number, status, create_time) values (#{seatId}, #{roomId}, #{seatNumber}, #{status}, now())")
     void addSeatForRoom(Seats seat);
 
-    @Select("select * from seat where id = #{seatId}")
-    Seats getSeatById(Integer seatId);
+    @Select("select * from seat where seat_id = #{seatId}")
+    Seats getSeatById(String seatId);
 
-    @Delete("delete from seat where id = #{seatId}")
-    void deleteSeat(Integer seatId);
+    @Delete("delete from seat where seat_id = #{seatId}")
+    void deleteSeat(String seatId);
 
     @Update("""
             update room
-            set room_name = #{roomName},
-                location = #{location},
-                total_seats = #{totalSeats},
-                open_time = #{openTime},
-                close_time = #{closeTime},
-                status = #{status}
+            set location = COALESCE(#{location}, location),
+                total_seats = COALESCE(#{totalSeats}, total_seats),
+                open_time = COALESCE(#{openTime}, open_time),
+                close_time = COALESCE(#{closeTime}, close_time),
+                status = COALESCE(#{status}, status)
             where room_id = #{roomId}
             """)
     void updateRoom(RoomUpdateDTO roomUpdateDTO);
@@ -73,11 +72,11 @@ public interface AdminMapper {
     @Update("update room set full_status = #{fullStatus} where room_id = #{roomId}")
     void updateRoomFullStatus(@Param("roomId") String roomId, @Param("fullStatus") Integer fullStatus);
 
-    @Update("update seat set status = #{status} where id = #{seatId}")
-    void updateSeatStatus(@Param("seatId") Integer seatId, @Param("status") Integer status);
+    @Update("update seat set status = #{status} where seat_id = #{seatId}")
+    void updateSeatStatus(@Param("seatId") String seatId, @Param("status") Integer status);
 
     @Select("select count(1) from reservation where seat_id = #{seatId} and status = #{status}")
-    Integer countReservationsBySeatAndStatus(@Param("seatId") Integer seatId, @Param("status") Integer status);
+    Integer countReservationsBySeatAndStatus(@Param("seatId") String seatId, @Param("status") Integer status);
 
     @Select("select * from reservation where id = #{id}")
     Reservation getReservationById(Integer id);
@@ -89,7 +88,7 @@ public interface AdminMapper {
     void deleteReservationsByRoomId(String roomId);
 
     @Delete("delete from reservation where seat_id = #{seatId}")
-    void deleteReservationsBySeatId(Integer seatId);
+    void deleteReservationsBySeatId(String seatId);
 
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert("insert into notice (title, content, create_time) values (#{title}, #{content}, now())")
@@ -101,21 +100,21 @@ public interface AdminMapper {
     @Select("select count(1) from notice where id = #{id}")
     Integer countNoticeById(Integer id);
 
-    // Seats
-    @Delete("Delete from seats where room_id = #{roomId}")
+    // Seat
+    @Delete("Delete from seat where room_id = #{roomId}")
     void deleteSeatsByRoomId(String roomId);
 
-    @Delete("Delete from seats where seat_id = #{seatId}")
+    @Delete("Delete from seat where seat_id = #{seatId}")
     void deleteSeatForRoom(String seatId);
 
-    @Select("select * from seats where room_id = #{roomId} and seat_number > #{seatNumber} order by seat_number")
+    @Select("select * from seat where room_id = #{roomId} and seat_number > #{seatNumber} order by seat_number")
     List<Seats> findSeatsAfter(String roomId, Integer seatNumber);
 
-    @Update("update seats set seat_id = #{newSeatId}, seat_number = #{newSeatNumber} where seat_id = #{oldSeatId}")
+    @Update("update seat set seat_id = #{newSeatId}, seat_number = #{newSeatNumber} where seat_id = #{oldSeatId}")
     void updateSeat(@Param("oldSeatId") String oldSeatId, @Param("newSeatId") String newSeatId,
             @Param("newSeatNumber") int newSeatNumber);
 
-    @Select("select count(*) from seats where room_id = #{roomId} and status = 1")
+    @Select("select count(*) from seat where room_id = #{roomId} and status = 1")
     int countReservedSeats(String roomId);
 
     @Select("select total_seats from room where room_id = #{roomId}")

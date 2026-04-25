@@ -11,7 +11,7 @@ public class ReservationAddDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String roomId;
-    private Integer seatId;
+    private String seatId;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate reserveDate;

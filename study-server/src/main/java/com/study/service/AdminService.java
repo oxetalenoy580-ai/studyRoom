@@ -20,7 +20,7 @@ public interface AdminService {
 
     void addSeatForRoom(String roomId);
 
-    void deleteSeat(Integer seatId);
+    void deleteSeat(String seatId);
 
     List<ReservationVO> getReservationList();
 

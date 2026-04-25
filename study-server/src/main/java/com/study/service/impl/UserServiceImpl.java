@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
             .status(StatuConstant.RESERVATION_PENDING)
             .build();
         userMapper.addReservation(reservation);
-        userMapper.updateSeatStatus(reservationAddDTO.getSeatId(), StatuConstant.SEAT_RESERVED);
+        userMapper.updateSeatStatus(seat.getSeatId(), StatuConstant.SEAT_RESERVED);
         refreshRoomFullStatus(reservationAddDTO.getRoomId());
     }
 
@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Reservation cannot be canceled in current status");
         }
         userMapper.updateReservationStatus(reservationId, StatuConstant.RESERVATION_CANCELED);
-        refreshSeatStatus(reservation.getSeatId());
+        refreshSeatStatus(String.valueOf(reservation.getSeatId()));
         refreshRoomFullStatus(reservation.getRoomId());
     }
 
@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
         return MD5Util.encrypt(rawPassword).equals(dbPassword);
     }
 
-    private void refreshSeatStatus(Integer seatId) {
+    private void refreshSeatStatus(String seatId) {
         int pendingCount = userMapper.countReservationsBySeatAndStatus(seatId, StatuConstant.RESERVATION_PENDING);
         userMapper.updateSeatStatus(seatId, pendingCount > 0 ? StatuConstant.SEAT_RESERVED : StatuConstant.SEAT_AVAILABLE);
     }

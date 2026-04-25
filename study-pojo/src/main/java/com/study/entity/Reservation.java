@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reservation implements Serializable {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private Integer id;
-  private String userUsername;
-  private String roomId;
-  private Integer seatId;
-  private LocalDate reserveDate;
-  private LocalTime startTime;
-  private LocalTime endTime;
-  private Integer status;
-  private LocalDateTime createTime;
+    private Integer id;
+    private String userUsername;
+    private String roomId;
+    private String seatId;
+    private LocalDate reserveDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private Integer status;
+    private LocalDateTime createTime;
 }

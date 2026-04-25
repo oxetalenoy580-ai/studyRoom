@@ -15,7 +15,7 @@ public class ReservationVO implements Serializable {
     private String userName;
     private String roomId;
     private String roomName;
-    private Integer seatId;
+    private String seatId;
     private LocalDate reserveDate;
     private LocalTime startTime;
     private LocalTime endTime;

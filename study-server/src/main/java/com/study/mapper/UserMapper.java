@@ -36,8 +36,8 @@ public interface UserMapper {
     @Select("select * from room where room_id = #{roomId}")
     Room getRoomById(String roomId);
 
-    @Select("select * from seat where id = #{seatId}")
-    Seats getSeatById(Integer seatId);
+    @Select("select * from seat where seat_id = #{seatId}")
+    Seats getSeatById(String seatId);
 
     @Select("""
         select count(1)
@@ -48,7 +48,7 @@ public interface UserMapper {
           and start_time < #{endTime}
           and end_time > #{startTime}
         """)
-    Integer countSeatConflict(@Param("seatId") Integer seatId,
+    Integer countSeatConflict(@Param("seatId") String seatId,
                               @Param("reserveDate") LocalDate reserveDate,
                               @Param("startTime") LocalTime startTime,
                               @Param("endTime") LocalTime endTime);
@@ -101,10 +101,10 @@ public interface UserMapper {
     void updateReservationStatus(@Param("id") Integer id, @Param("status") Integer status);
 
     @Select("select count(1) from reservation where seat_id = #{seatId} and status = #{status}")
-    Integer countReservationsBySeatAndStatus(@Param("seatId") Integer seatId, @Param("status") Integer status);
+    Integer countReservationsBySeatAndStatus(@Param("seatId") String seatId, @Param("status") Integer status);
 
-    @Update("update seat set status = #{status} where id = #{seatId}")
-    void updateSeatStatus(@Param("seatId") Integer seatId, @Param("status") Integer status);
+    @Update("update seat set status = #{status} where seat_id = #{seatId}")
+    void updateSeatStatus(@Param("seatId") String seatId, @Param("status") Integer status);
 
     @Select("select count(1) from seat where room_id = #{roomId}")
     Integer countSeatsByRoomId(String roomId);
