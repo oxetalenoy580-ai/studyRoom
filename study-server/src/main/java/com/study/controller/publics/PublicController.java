@@ -1,6 +1,7 @@
 package com.study.controller.publics;
 
 import com.study.Result.Result;
+import com.study.dto.UserRegisterDTO;
 import com.study.entity.Notice;
 import com.study.entity.Room;
 import com.study.entity.Seats;
@@ -11,6 +12,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,5 +47,12 @@ public class PublicController {
     @Operation(summary = "Notice list")
     public Result<List<Notice>> noticeList() {
         return Result.success(publicService.listNotices());
+    }
+
+    @PostMapping("/user/register")
+    @Operation(summary = "Register user")
+    public Result<Void> register(@RequestBody UserRegisterDTO registerDTO) {
+        publicService.register(registerDTO);
+        return Result.success();
     }
 }

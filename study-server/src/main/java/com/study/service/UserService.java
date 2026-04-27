@@ -9,7 +9,6 @@ import com.study.vo.UserInfoVO;
 import java.util.List;
 
 public interface UserService {
-    void register(UserRegisterDTO registerDTO);
 
     UserInfoVO getCurrentUserInfo(String username);
 

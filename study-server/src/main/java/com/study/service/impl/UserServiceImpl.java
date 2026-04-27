@@ -30,26 +30,6 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    @Transactional
-    public void register(UserRegisterDTO registerDTO) {
-        if (!StringUtils.hasText(registerDTO.getUsername())
-            || !StringUtils.hasText(registerDTO.getPassword())
-            || !StringUtils.hasText(registerDTO.getName())) {
-            throw new RuntimeException("Registration information is incomplete");
-        }
-        if (userMapper.countUserByUsername(registerDTO.getUsername()) > 0) {
-            throw new RuntimeException("Username already exists");
-        }
-        User user = User.builder()
-            .username(registerDTO.getUsername())
-            .password(MD5Util.encrypt(registerDTO.getPassword()))
-            .name(registerDTO.getName())
-            .phone(registerDTO.getPhone())
-            .build();
-        userMapper.addUser(user);
-    }
-
-    @Override
     public UserInfoVO getCurrentUserInfo(String username) {
         User user = getUser(username);
         UserInfoVO userInfoVO = new UserInfoVO();
@@ -96,7 +76,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Seat is not available");
         }
         if (reservationAddDTO.getReserveDate() == null || reservationAddDTO.getStartTime() == null
-            || reservationAddDTO.getEndTime() == null) {
+                || reservationAddDTO.getEndTime() == null) {
             throw new RuntimeException("Reservation time is required");
         }
         if (reservationAddDTO.getReserveDate().isBefore(LocalDate.now().plusDays(1))) {
@@ -106,27 +86,27 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Reservation time range is invalid");
         }
         if (reservationAddDTO.getStartTime().isBefore(room.getOpenTime())
-            || reservationAddDTO.getEndTime().isAfter(room.getCloseTime())) {
+                || reservationAddDTO.getEndTime().isAfter(room.getCloseTime())) {
             throw new RuntimeException("Reservation time is outside room hours");
         }
         if (userMapper.countSeatConflict(reservationAddDTO.getSeatId(), reservationAddDTO.getReserveDate(),
-            reservationAddDTO.getStartTime(), reservationAddDTO.getEndTime()) > 0) {
+                reservationAddDTO.getStartTime(), reservationAddDTO.getEndTime()) > 0) {
             throw new RuntimeException("Seat is already reserved for the selected time");
         }
         if (userMapper.countUserConflict(username, reservationAddDTO.getReserveDate(),
-            reservationAddDTO.getStartTime(), reservationAddDTO.getEndTime()) > 0) {
+                reservationAddDTO.getStartTime(), reservationAddDTO.getEndTime()) > 0) {
             throw new RuntimeException("You already have another reservation in this time range");
         }
 
         Reservation reservation = Reservation.builder()
-            .userUsername(username)
-            .roomId(reservationAddDTO.getRoomId())
-            .seatId(reservationAddDTO.getSeatId())
-            .reserveDate(reservationAddDTO.getReserveDate())
-            .startTime(reservationAddDTO.getStartTime())
-            .endTime(reservationAddDTO.getEndTime())
-            .status(StatuConstant.RESERVATION_PENDING)
-            .build();
+                .userUsername(username)
+                .roomId(reservationAddDTO.getRoomId())
+                .seatId(reservationAddDTO.getSeatId())
+                .reserveDate(reservationAddDTO.getReserveDate())
+                .startTime(reservationAddDTO.getStartTime())
+                .endTime(reservationAddDTO.getEndTime())
+                .status(StatuConstant.RESERVATION_PENDING)
+                .build();
         userMapper.addReservation(reservation);
         userMapper.updateSeatStatus(seat.getSeatId(), StatuConstant.SEAT_RESERVED);
         refreshRoomFullStatus(reservationAddDTO.getRoomId());
@@ -170,7 +150,8 @@ public class UserServiceImpl implements UserService {
 
     private void refreshSeatStatus(String seatId) {
         int pendingCount = userMapper.countReservationsBySeatAndStatus(seatId, StatuConstant.RESERVATION_PENDING);
-        userMapper.updateSeatStatus(seatId, pendingCount > 0 ? StatuConstant.SEAT_RESERVED : StatuConstant.SEAT_AVAILABLE);
+        userMapper.updateSeatStatus(seatId,
+                pendingCount > 0 ? StatuConstant.SEAT_RESERVED : StatuConstant.SEAT_AVAILABLE);
     }
 
     private void refreshRoomFullStatus(String roomId) {

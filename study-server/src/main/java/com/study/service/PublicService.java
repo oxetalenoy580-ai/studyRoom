@@ -1,5 +1,6 @@
 package com.study.service;
 
+import com.study.dto.UserRegisterDTO;
 import com.study.entity.Notice;
 import com.study.entity.Room;
 import com.study.entity.Seats;
@@ -13,4 +14,6 @@ public interface PublicService {
     List<Seats> listSeats(String roomId);
 
     List<Notice> listNotices();
+
+    void register(UserRegisterDTO registerDTO);
 }

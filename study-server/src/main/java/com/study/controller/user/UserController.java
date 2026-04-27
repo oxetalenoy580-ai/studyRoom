@@ -32,13 +32,6 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/user/register")
-    @Operation(summary = "Register user")
-    public Result<Void> register(@RequestBody UserRegisterDTO registerDTO) {
-        userService.register(registerDTO);
-        return Result.success();
-    }
-
     @GetMapping("/user/info")
     @Operation(summary = "Get user info")
     public Result<UserInfoVO> info(@RequestHeader(value = "token", required = false) String token) {
